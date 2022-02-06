@@ -1,0 +1,27 @@
+body { 
+    background-color : #ffffaa;                
+    font-family: verdana, arial, sans-serif;
+    font-size: 8 pt;
+}
+        
+h1 { 
+    background-color : #ffff77; 
+}
+
+a:visited { color : #556b2f; }
+a:link { color: #8b0000 ;}
+a:active { color: #9400d3; }
+
+        
+.tablebox { 
+    background-color: #ffff77; 
+    padding: 10px; 
+    vertical-align: top;
+    font-family: verdana, arial, sans-serif;
+    font-size: 8pt;
+}
+        
+.tablecell { 
+    vertical-align: top; 
+    padding : 10px;
+}

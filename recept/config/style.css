@@ -1,0 +1,28 @@
+hr
+{
+    color: blue;
+}
+
+.tablecell { padding : 0px }
+
+
+.menuhead
+{
+    font-style : normal;
+    color     : blue;
+}
+.letter
+{
+    font-family : "Courier New", monospace;
+}
+.comment
+{
+    font-family : "Courier New", monospace;
+    font-size   : 10pt;
+}
+.commentlink
+{
+    font-family : "Courier New",monospace;
+    font-size   : 10pt;
+    font-style  : italic;    
+}
