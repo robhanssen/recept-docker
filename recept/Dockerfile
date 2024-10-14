@@ -1,9 +1,7 @@
 FROM php:5.6-apache
 
+# neceesary steps after Debian moved Stretch to archive
 RUN rm /etc/apt/sources.list
-
-RUN rm /etc/apt/sources.list
-
 RUN echo "deb [trusted=yes] http://archive.debian.org/debian-security stretch/updates main" >> /etc/apt/sources.list.d/stretch.list
 RUN echo "deb [trusted=yes] http://archive.debian.org/debian stretch main" >> /etc/apt/sources.list.d/stretch.list
 
