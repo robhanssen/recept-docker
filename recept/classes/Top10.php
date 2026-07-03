@@ -1,10 +1,10 @@
 <?php
 date_default_timezone_set('America/Atlanta');
-define (TODAY, date("Ymd"));
-define (WEEKAGO, date('Ymd', strtotime('-'. 7 .' days')));
-define (TIMEAGE, 28);
-define (TIMELIMIT, date('Ymd', strtotime('-'. TIMEAGE .' days')));
-define (CUTOFF, 50);
+define('TODAY', date('Ymd'));
+define('WEEKAGO', date('Ymd', strtotime('-'. 7 .' days')));
+define('TIMEAGE', 28);
+define('TIMELIMIT', date('Ymd', strtotime('-'. TIMEAGE .' days')));
+define('CUTOFF', 50);
 
 class Top10
 {
@@ -254,7 +254,7 @@ class Top10
                   %where%
                   group by viewtime
                   order by viewtime ASC";
-       $query = ereg_replace("%where%", $where, $query);
+       $query = preg_replace('/%where%/', $where, $query);
        //echo $query;
        $this->db->DBQuery($query);
        while ($hit = $this->db->DBResult()) 
@@ -286,7 +286,7 @@ class Top10
            default	: $where .= " and viewtime = " . $this->viewtime ; break;
        }    
 
-       $query = ereg_replace("%where%", $where, $query);
+       $query = preg_replace('/%where%/', $where, $query);
        //echo $query;
        $this->db->DBQuery($query);
        while ($recept = $this->db->DBResult()) 

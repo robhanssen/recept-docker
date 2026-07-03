@@ -97,7 +97,7 @@ Class EMail
     
     function _validEmail($email)
     {
-        if (eregi("^[0-9a-z_]([_\.-]?[0-9a-z])*@[0-9a-z][0-9a-z\.-]*\.[a-z]{2,4}\.?$", $email, $check))
+        if (preg_match('/^[0-9a-z_]([_\.-]?[0-9a-z])*@[0-9a-z][0-9a-z\.-]*\.[a-z]{2,4}\.?$/i', $email, $check))
         {
             if ( getmxrr(substr(strstr($check[0], '@'), 1), $validate_email_temp) )
             {

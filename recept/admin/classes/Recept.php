@@ -13,7 +13,7 @@ class Recept
 
     var $tblname;
 
-    function Recept()
+    public function __construct()
     {
         $this->id = intval($_POST['receptid']);
         $this->naam = addslashes(htmlspecialchars($_POST['naam']));
@@ -215,7 +215,7 @@ class ReceptPage extends Webpage
     function ReceptPage($title, $style, $db, $auth, $author="", $email="", $keywords="",$description="")
     {
        global $PHP_SELF;
-       $alfa = array(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z);
+       $alfa = range('a', 'z');
        Webpage::Webpage($title, $style, $author, $email, $keywords,$description);
        echo "<div align=\"right\" class=\"menuhead\">ReceptenLijst<br>User : ". $auth->getUsername() . "<br>" . $this->recipecount($db). " recipes</div>";
 

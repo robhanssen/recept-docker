@@ -10,7 +10,7 @@ class Webpage
     var $description;
 
 
-    function Webpage($title, $stylesheet="", $author="",$email="",$keywords="",$description="")
+    public function __construct($title, $stylesheet="", $author="",$email="",$keywords="",$description="")
     {
         $this->title = $title;
         $this->stylesheet = $stylesheet;
@@ -22,7 +22,7 @@ class Webpage
         $this->Header();
     }
 
-    function Header()
+    public function Header()
     {
         ob_start();
         global $PHP_SELF;
@@ -38,7 +38,7 @@ class Webpage
         echo "</head><body>";
     }
 
-    function Footer()
+    public function Footer()
     {
           /*
           global $visitor;
@@ -57,7 +57,7 @@ class Webpage
           ob_end_flush();
     }
 
-    function InsertLink($link, $linktext,$linkcomment)
+    public function InsertLink($link, $linktext,$linkcomment)
     {
         if (!$linktext) die("invalid link: linktext not specified");
 

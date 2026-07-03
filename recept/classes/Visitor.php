@@ -2,8 +2,8 @@
 
 //include_once("./config/config.php");
 
-define(INTERVAL, 5*60);
-define(ONEDAY, 24*60*60);
+define('INTERVAL', 5*60);
+define('ONEDAY', 24*60*60);
 
 Class Visitor
 {
@@ -11,24 +11,25 @@ Class Visitor
     var $NumVisitors;
     var $DBLink;
 
-    function Visitor()
+    public function __construct()
     {
-        $this->Time = mktime();
+        $this->Time = time();
         $this->DBConnect();
         $this->CountVisitors();
-        //$this->DBClose();
     }
 
-    function DBConnect()
+    public function DBConnect()
     {
         global $Host,$User,$Name,$Pass;
-        $this->DBLink = mysql_connect($Host,$User,$Pass) or die("Cannot connect to $Host");
-        $l = mysql_select_db($Name,$this->DBLink) or die("Cannot select $Name"); 
+        $this->DBLink = new mysqli($Host, $User, $Pass, $Name);
+        if ($this->DBLink->connect_error) {
+            die("Cannot connect to $Host");
+        }
     }
     
-    function DBClose()
+    public function DBClose()
     {
-       $l = mysql_close($this->DBLink);
+       $this->DBLink->close();
     }
 
 
@@ -44,8 +45,8 @@ Class Visitor
     {
         $vis5 = $this->Time - INTERVAL;    
         $query = "SELECT count(distinct(viewip)) as numvis FROM viewed WHERE viewunixtime > $vis5";
-        $rs = mysql_query($query) or die("Unable to perform query: $query");
-        $r = mysql_fetch_object($rs);
+        $rs = $this->DBLink->query($query) or die("Unable to perform query: $query");
+        $r = $rs->fetch_object();
         $this->NumVisitors = $r->numvis;
     }
 
@@ -78,8 +79,8 @@ Class Visitor
                   ORDER BY viewunixtime DESC"; 
 
         echo "<table border=\"1\"><tr><td><b>Visitor</b><td><b>IP address</b><td><b>Visit Date</b><td><b><a href=\"?order=time\">Time</a></b><td><b><a href=\"?order=number\">Recept</a></b>";  
-        $rs = mysql_query($query) or die("Unable to perform query: $query");
-        while ($r = mysql_fetch_object($rs))
+        $rs = $this->DBLink->query($query) or die("Unable to perform query: $query");
+        while ($r = $rs->fetch_object())
         {
            $datetime = $r->viewunixtime;
            $date = date("d/m/Y", $datetime);
@@ -105,14 +106,14 @@ Class Visitor
                   ORDER BY $orderby DESC";
                 
         echo "<table border=\"1\"><tr><td><b>Visitor</b><td><b>IP address</b><td><b>Visit Date</b><td><b><a href=\"?order=time\">Time</a></b><td><b><a href=\"?order=number\"># of visits</a></b>";  
-        $rs = mysql_query($query) or die("Unable to perform query: $query");
-        while ($r = mysql_fetch_object($rs))
+        $rs = $this->DBLink->query($query) or die("Unable to perform query: $query");
+        while ($r = $rs->fetch_object())
         {
            $datetime = $r->viewunixtime;
            $date = date("d/m/Y", $datetime);
            $h = date("H:i:s", $datetime);
            $name = gethostbyaddr($r->viewip);
-           if (!ereg("(crawl|bot|search)",$name))
+           if (!preg_match('/(crawl|bot|search)/i', $name))
            {
               if ($datetime < $vis5)
                 echo "<tr><td>" . $this->constructlink($r->viewip,$name) . "<td>".$r->viewip."<td>$date</td><td>$h</td><td>" . $r->visnr ."</td>";

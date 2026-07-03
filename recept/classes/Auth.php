@@ -7,29 +7,29 @@ if (file_exists("config/config.php")) require_once("config/config.php");
 if (file_exists("../config/config.php")) require_once("../config/config.php");
 
 // let's define some constants for the database
-define(__DEFAULTHOST__, $Host);
-define(__DEFAULTNAME__, $Name);
-define(__DEFAULTUSER__,  $User);
-define(__DEFAULTPASS__, $Pass);
-define(__DEFAULTTABLE__, "users");
+define('__DEFAULTHOST__', $Host);
+define('__DEFAULTNAME__', $Name);
+define('__DEFAULTUSER__',  $User);
+define('__DEFAULTPASS__', $Pass);
+define('__DEFAULTTABLE__', 'users');
 // the default permission; since 'permission' is an int(2), all permissions are lower than 100.
-define(__DEFAULTPERMISSION__, 100);
+define('__DEFAULTPERMISSION__', 100);
 
 if (file_exists("../config/config.php")) require_once("../config/config.php");
 if (file_exists("../../config/config.php")) require_once("../../config/config.php");
 if (file_exists("../../../config/config.php")) require_once("../../../config/config.php");
 
-define(VIEW,99);
-define(TOURPOOL,98);
-define(GUIDELINE,20);
-define(SEMINAR,15);
-define(PUBS,10);
-define(EDIT,7);
-define(ADVEDIT,4);
-define(SUPER,2);
-define(ADMIN,1);
+define('VIEW', 99);
+define('TOURPOOL', 98);
+define('GUIDELINE', 20);
+define('SEMINAR', 15);
+define('PUBS', 10);
+define('EDIT', 7);
+define('ADVEDIT', 4);
+define('SUPER', 2);
+define('ADMIN', 1);
 
-define(EXACT, "exact-auth-match");
+define('EXACT', 'exact-auth-match');
 
 $PermissionList = array(VIEW => "View Only",
                         TOURPOOL => "Tourpool",
@@ -45,20 +45,20 @@ $PermissionList = array(VIEW => "View Only",
 
 Class Auth
 {
-    var $authUserid;           // string: the userid, a unique name in the database
-    var $authUsername;         // string: the real name of the user
-    var $authUserPass;         // string: password
-    var $authUserPermission;   // int(2): user permission level
-    var $LoggedOn;             // bool  : logged on or not
-    var $PageLevel;            // int   : the auth level of the protected page
+    public $authUserid;           // string: the userid, a unique name in the database
+    public $authUsername;         // string: the real name of the user
+    public $authUserPass;         // string: password
+    public $authUserPermission;   // int(2): user permission level
+    public $LoggedOn;             // bool  : logged on or not
+    public $PageLevel;            // int   : the auth level of the protected page
 
-    var $Host;
-    var $Name;
-    var $Table;
-    var $User;
-    var $Pass;
+    public $Host;
+    public $Name;
+    public $Table;
+    public $User;
+    public $Pass;
 
-    function Auth($PageLevel)
+    public function __construct($PageLevel)
     {     
         // first do all the database stuff
         // all the $Host,$Name,User,$Pass and $Table vars could be stored in
@@ -104,9 +104,14 @@ Class Auth
         $this->User  = ($user !="")  ? $user  : __DEFAULTUSER__;
         $this->Pass  = ($pass !="")  ? $pass  : __DEFAULTPASS__;
         $this->Table = ($table!="")  ? $table : __DEFAULTTABLE__;
-        $_connect = mysql_pconnect($this->Host,$this->User,$this->Pass);
-        $_select  = mysql_select_db($this->Name,$_connect);
-        return ($_connect && $_select); 
+
+        $mysqli = new mysqli($this->Host, $this->User, $this->Pass, $this->Name);
+        if ($mysqli->connect_error) {
+            return false;
+        }
+
+        $this->db = $mysqli;
+        return true;
     }
 
 
@@ -115,7 +120,7 @@ Class Auth
         if (isset($_SESSION['authuseridr'])) $authuserid = $_SESSION['authuseridr'];
         else if (isset($_POST['authuserid'])) $authuserid = $_POST['authuserid'];
         else $authuserid = "";
-        if (ereg(" ",$authuserid)) $authuserid = "";
+        if (preg_match('/\s/', $authuserid)) $authuserid = "";
         return $authuserid;
     }
 
@@ -204,7 +209,7 @@ Class Auth
     {
     global $Style;
     foreach($_SESSION as $key => $value)
-         session_unregister($key);
+         unset($_SESSION[$key]);
     session_destroy();
     ?>
     <html>
@@ -225,13 +230,6 @@ Class Auth
     function _login()
     {
         global $PHP_SELF, $Style, $_SESSION;
-/*        
-        session_unregister("authuseridr");
-        session_unregister("authusernamer");
-        session_unregister("authuserissetr");
-        session_unregister("authuserpermr");
-*/
-
         unset($_SESSION['authuseridr']);
         unset($_SESSION['authusernamer']);
         unset($_SESSION['authuserissetr']);
@@ -281,11 +279,11 @@ Class Auth
               $query = "SELECT username,permission FROM $this->Table WHERE userid = '$this->authUserid' AND permission <= $this->PageLevel";
           else
               $query = "SELECT username,permission,password FROM $this->Table WHERE userid = '$this->authUserid' and password = password('$this->authUserPass') AND permission <= $this->PageLevel";
-          $result = mysql_query($query) or die("Query failed");
-          if(mysql_num_rows($result) == 0) return 0;
+          $result = $this->db->query($query);
+          if ($result === false || $result->num_rows === 0) return 0;
           else
           {
-              $query_data = mysql_fetch_row($result);
+              $query_data = $result->fetch_row();
               return $query_data;
           }
     }
@@ -320,19 +318,10 @@ Class Auth
         $_SESSION['authusernamer'] = $this->authUsername;
         $_SESSION['authissetr'] = $this->LoggedOn;
         $_SESSION['authuserpermr'] = $this->authUserPermission;
-        
-        session_register("authuseridr", "authusernamer","authissetr","authuserpermr");
     }
     
     function _endSession()
     {
-/*
-        session_unregister("authuseridr");
-        session_unregister("authusernamer");
-        session_unregister("authuserissetr");
-        session_unregister("authuserpermr");
- */  
-
         unset($_SESSION['authuseridr']);
         unset($_SESSION['authusernamer']);
         unset($_SESSION['authissetr']);

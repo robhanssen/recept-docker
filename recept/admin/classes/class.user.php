@@ -2,20 +2,20 @@
 // <$Id: class.user.php,v 1.6 2002/12/12 13:23:41 rob Exp $>
 
 // define some constants
-define(__DEFAULTUSERID__, "");
-define(__DEFAULTUSERNAME__, "");
-define(__DEFAULTPASS__, "");
-define(__DEFAULTPERMISSION__, 100);
+define('__DEFAULTUSERID__', '');
+define('__DEFAULTUSERNAME__', '');
+define('__DEFAULTPASS__', '');
+define('__DEFAULTPERMISSION__', 100);
 // define actions
-define(__NOACTION__,0);
-define(__NEW__, 1);
-define(__ADD__, 2);
-define(__EDIT__,3);
-define(__UPDATE__,4);
-define(__DELETE__,5);
+define('__NOACTION__', 0);
+define('__NEW__', 1);
+define('__ADD__', 2);
+define('__EDIT__', 3);
+define('__UPDATE__', 4);
+define('__DELETE__', 5);
 // define some permissions;
-define(ADMIN, 1);
-define(VIEW, 99);
+define('ADMIN', 1);
+define('VIEW', 99);
 
 class AuthClassedEdit
 {
@@ -25,7 +25,7 @@ class AuthClassedEdit
     var $permission;
     var $tblname;
 
-    function AuthClassedEdit($auth)
+    public function __construct($auth)
     {
        $this->tblname = "users";
 
@@ -61,14 +61,14 @@ class AuthClassedEdit
          else if ($_GET['action'] == "update" && isset($_GET['update'])) $userid = $_GET['update']; 
          else if ($_GET['action'] == "delete" && isset($_GET['delete'])) $userid = $_GET['delete']; 
          else $userid = __DEFAULTUSERID__;
-         if (ereg("^[A-Za-z0-9_+-.,]*$", $userid)) return $userid;
+         if (preg_match('/^[A-Za-z0-9_+-.,]*$/', $userid)) return $userid;
          else return __DEFAULTUSERID__;
     }
 
     function setUsername($auth)
     {
          $username = isset($_POST['authusername']) ? $_POST['authusername'] : __DEFAULTUSERNAME__;
-         if (ereg("^[A-Za-z0-9_+-.,\ ]*$", $username)) return $username;         
+         if (preg_match('/^[A-Za-z0-9_+-.,\ ]*$/', $username)) return $username;         
          else return __DEFAULTUSERNAME__;
     }
 
@@ -117,22 +117,22 @@ class AuthClassedEdit
                                                             password('$this->password'),
                                                             $this->permission
                                                             );";
-             if ($auth->isPermitted(ADMIN))  mysql_query($query);
+             if ($auth->isPermitted(ADMIN))  $auth->db->query($query);
         }
      }
 
      function Delete($auth)
      {
          $query = "DELETE from $this->tblname WHERE userid = '$this->userid';";
-         if ($auth->isPermitted(ADMIN))  mysql_query($query);
+         if ($auth->isPermitted(ADMIN))  $auth->db->query($query);
      }
 
      function Edit($auth)
      {
          global $PHP_SELF;
          $query = "SELECT * from $this->tblname WHERE userid = '$this->userid';";
-         $resultset = mysql_query($query);
-         $r = mysql_fetch_object($resultset);
+         $resultset = $auth->db->query($query);
+         $r = $resultset->fetch_object();
             $this->userid = $r->userid;
             $this->username = $r->username;
             $this->password = $r->password;
@@ -155,7 +155,7 @@ class AuthClassedEdit
                                     password = password(\"$this->password\"),
                                     permission = $this->permission
                           WHERE userid = '$this->userid';";
-         if ($auth->isPermitted(ADMIN)||$auth->getUserid() == $this->userid) $r = mysql_query($query) or die("unable to process query : $query");
+         if ($auth->isPermitted(ADMIN)||$auth->getUserid() == $this->userid) $r = $auth->db->query($query) or die("unable to process query : $query");
      }
 
      function Enter($auth,$func)
@@ -228,7 +228,7 @@ class AuthClassedEdit
         if (!$auth->isPermitted(ADMIN)) $where = " WHERE userid = '" . $auth->getUserid(). "'"; 
         else $where = "";
         $query = "SELECT * from $this->tblname $where ORDER by permission asc";
-        $resultset = mysql_query($query);
+        $resultset = $auth->db->query($query);
         echo "<p><table width=\"100%\">";
         echo "<TR>
               <TD width=\"15%\"><b>Userid</b></TD>
@@ -237,7 +237,7 @@ class AuthClassedEdit
               if ($auth->isPermitted(VIEW))
               echo "<TD width=\"5%\"><b>Edit</b></TD>
                     <TD width=\"5%\"><b>Delete</b></TD></TR>";
-        while ($result = mysql_fetch_object($resultset))
+        while ($result = $resultset->fetch_object())
         {
             echo "<tr>";
             echo "<td>" . $result->userid . "</td>";

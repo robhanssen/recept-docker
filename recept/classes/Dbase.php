@@ -2,17 +2,17 @@
 
 class DataBase
 {
-    var $dbhost;
-    var $dbname;
-    var $dbuser;
-    var $dbpass;
-    var $linkid;
-    var $query;
-    var $queryresult;
-    var $queryobject;
-    var $numrows;
+    public $dbhost;
+    public $dbname;
+    public $dbuser;
+    public $dbpass;
+    public $linkid;
+    public $query;
+    public $queryresult;
+    public $queryobject;
+    public $numrows;
 
-    function DataBase($host, $name, $user, $passwd)
+    public function __construct($host, $name, $user, $passwd)
     {
         $this->dbhost = $host;
         $this->dbname = $name;
@@ -21,49 +21,51 @@ class DataBase
         $this->DBConnect();
     }
 
-    function DBConnect()
+    public function DBConnect()
     {
-	//die($this->dbhost. $this->dbuser. $this->dbpass. $this->dbname);
-	$this->linkid = new mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->dbname);
-
+        $this->linkid = new mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->dbname);
+        if ($this->linkid->connect_error) {
+            throw new RuntimeException('Database connection failed: ' . $this->linkid->connect_error);
+        }
     }
 
-    function DBQuery($query="")
+    public function DBQuery($query = "")
     {
+        if ($query) {
+            $this->query = $query;
+        }
 
-        if ($query) $this->query = $query;
-        $this->queryresult = mysqli_query($this->linkid, $this->query) or die("QUERY Failed!".$this->query);
-        //if (!empty($this->queryresult) $this->numrows = mysql_num_rows($this->queryresult);
+        $this->queryresult = mysqli_query($this->linkid, $this->query);
+        if ($this->queryresult === false) {
+            throw new RuntimeException('QUERY Failed! ' . $this->query . ' :: ' . mysqli_error($this->linkid));
+        }
     }
 
-    function DBResult()
+    public function DBResult()
     {
         $this->queryobject = mysqli_fetch_object($this->queryresult);
         return $this->queryobject;
     }
 
-    function DBClose()
+    public function DBClose()
     {
         mysqli_close($this->linkid);
     }
-    
-    function DBNumRows()
+
+    public function DBNumRows()
     {
         $this->numrows = mysqli_num_rows($this->queryresult);
         return $this->numrows;
     }
-   
-    function Getid()
+
+    public function Getid()
     {
-       return mysqli_insert_id();
+        return mysqli_insert_id($this->linkid);
     }
-    
-    function DBFetchRow()
+
+    public function DBFetchRow()
     {
-            return mysqli_fetch_row($this->queryresult);
+        return mysqli_fetch_row($this->queryresult);
     }
-    
 }
-
-
 ?>

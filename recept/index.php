@@ -9,8 +9,12 @@ require("classes/Auth.php");
 //include("classes/Visitor.php");
 require_once("config/config.php");
 
+if (!defined('TIMEAGE')) {
+    define('TIMEAGE', 28);
+}
+
 /*
-if (ereg("secure", $PHP_SELF)) $secure = true; else $secure = false;
+if (preg_match('/secure/', $PHP_SELF)) $secure = true; else $secure = false;
 switch ($secure)
 {
 case true :	$otherfile = "index.php"; $othername = "Open"; break;
@@ -36,7 +40,7 @@ $query_tpl = "SELECT gerecht, recepten.receptid as receptid,recepten.gerechtid a
               // see line 180: LIMIT %limit%,$maxlistlength";
 
 
-$alfa = array(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z);
+$alfa = range('a', 'z');
 
 $db->DBQuery("select distinct(substring(naam,1,1)) as firstletter from recepten order by firstletter"); 
 $alfaprint  = array(); 
@@ -64,7 +68,7 @@ $display = intval($_GET['display']);
 
 if ($_POST['orderby']) $order = $_POST['orderby'];
 else $order = "naam";
-if (!ereg("^(naam|keuken|recepten.gerechtid)$", $order)) $order = "naam";
+if (!preg_match('/^(naam|keuken|recepten\.gerechtid)$/', $order)) $order = "naam";
 
 switch ($order)
 {
@@ -97,7 +101,7 @@ foreach ($_GET as $get_var => $get_val) $switchvar .= "$get_var=$get_val&";
                if (in_array($letter, $alfaprint))
                echo "[<a href=\"$PHP_SELF?search=first&first=$letter\">$letter</a>]";
                else echo "[$letter]";
-               if (ereg("[ejot]",$letter)) echo "<br>";
+               if (preg_match('/[ejot]/', $letter)) echo "<br>";
        }
        ?>
        
@@ -161,7 +165,7 @@ switch($search)
     case "nieuw op de site"     : $searchoption = "ref" ; $searchterm = "'%'"; break;
     case "first"         : $searchoption = "naam"; $searchterm = "'".$_GET['first']."%'"; break; 
     case "zoek naam"     : $searchoption = "naam";
-                                if (!ereg(" ", $_POST['naam']))
+                                if (!preg_match('/\s/', $_POST['naam']))
                                    $searchterm = "'%".$_POST['naam']."%'";
                                 else
                                 {
@@ -170,7 +174,7 @@ switch($search)
                                 }
 				break;		
     case "naam"		 : $searchoption = "naam";
-                                if (!ereg(" ", $_GET['naam']))
+                                if (!preg_match('/\s/', $_GET['naam']))
                                    $searchterm = "'%".$_GET['naam']."%'";
                                 else
                                 {
@@ -180,7 +184,7 @@ switch($search)
 				break;		
     case "receptnaam"    : $searchoption = "naam"; $searchterm = "'%". urldecode($_GET['naam']) . "%'"; break;
     case "zoek ingredient"    : $searchoption = "ingredient"; 
-                                if (!ereg(" ", $_POST['ingredient']))
+                                if (!preg_match('/\s/', $_POST['ingredient']))
                                    $searchterm = "'%".$_POST['ingredient']."%'";
                                 else
                                 {
@@ -189,7 +193,7 @@ switch($search)
                                 }
 				break;		
     case "ingredient"    : $searchoption = "ingredient";
-                                if (!ereg(" ", urldecode($_GET['ingredient'])))
+                                if (!preg_match('/\s/', urldecode($_GET['ingredient'])))
                                    $searchterm = "'%".urldecode($_GET['ingredient'])."%'";
                                 else
                                 {
@@ -209,8 +213,8 @@ if (intval($_GET['show']))
 {
     $receptid = intval($_GET['show']);
     //$top10 = new Top10($db, $receptid);
-    $db->query = ereg_replace("%where%", "  recepten.receptid = $receptid ", $query_tpl);
-    $db->query = ereg_replace("%order%", " keuken ", $db->query);
+    $db->query = preg_replace('/%where%/', "  recepten.receptid = $receptid ", $query_tpl);
+    $db->query = preg_replace('/%order%/', " keuken ", $db->query);
     $db->DBQuery();
     $keukentype="";
     while ($recept = $db->DBResult())
@@ -260,15 +264,15 @@ if (intval($_GET['show']))
 }
 else 
 {
-    if (ereg("(keuken)",$search))
+    if (preg_match('/(keuken)/', $search))
        $where = "$searchoption = $searchterm";
     else $where = "$searchoption like $searchterm";
 
     if ($search == "nieuw op de site") $qorder = "recepten.receptid desc limit 15"; 
 
-    $db->query = ereg_replace("%where%", $where, $query_tpl);
-    $db->query = ereg_replace("%order%", $qorder, $db->query);
-    $db->query = ereg_replace("%limit%", "$display", $db->query);
+    $db->query = preg_replace('/%where%/', $where, $query_tpl);
+    $db->query = preg_replace('/%order%/', $qorder, $db->query);
+    $db->query = preg_replace('/%limit%/', "$display", $db->query);
     //echo $db->query;
 
     $db->DBQuery();

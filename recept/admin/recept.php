@@ -17,9 +17,9 @@ $recept = new Recept();
 $db->DBQuery("select count(receptid) as totaalrecept from recepten");
 $res = $db->DBResult();
 $totaalrecept = intval($res->totaalrecept);
-define(RECIPECOUNT, $totaalrecept);
+define('RECIPECOUNT', $totaalrecept);
 
-if ($_GET['display'] && ereg("^[A-Za-z]$", $_GET['display']))
+if ($_GET['display'] && preg_match('/^[A-Za-z]$/', $_GET['display']))
    $display = $_GET['display'];
 else $display = "a";
 
