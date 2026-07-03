@@ -151,9 +151,6 @@ foreach ($_GET as $get_var => $get_val) {
            </table>
            </fieldset>
        <td  class="tablecell"><?php 
-                 if (GOOGLE) 
-                     googlead();
-                 else 
                      echo "";//GenerateTop($db, 5);
             ?>
        <tr>
