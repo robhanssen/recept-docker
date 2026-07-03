@@ -23,8 +23,8 @@ function displayframe()
 <title>Recepten Administratie</title>
 </head>
 <frameset cols="188,*" border="0">
-    <frame name="admenu" target="admain" src="<? echo "$PHP_SELF?target=menu" ?>" scrolling="no" noresize>
-    <frame name="admain" scrolling="auto" src="<? echo "$PHP_SELF?target=main" ?>" target="_self">
+    <frame name="admenu" target="admain" src="<?php echo "$PHP_SELF?target=menu" ?>" scrolling="no" noresize>
+    <frame name="admain" scrolling="auto" src="<?php echo "$PHP_SELF?target=main" ?>" target="_self">
     <noframes>
         <body>
           <p>This page uses frames, but your browser doesn't support them.</p>
@@ -69,14 +69,14 @@ function displaymain($Auth,$menu)
 <head>
 <title>SKA Admininstration Panel (SKAAP)</title>
 <link rel="stylesheet" href="/style.css">
-<link rel="stylesheet" href="<? echo $Style ?>">
+<link rel="stylesheet" href="<?php echo $Style ?>">
 </head>
         <body>
-          <p>Welcome <? echo $Auth->authUsername ." (permission level:" . $PermissionList[$Auth->authUserPermission] . ")" ?></p>
+          <p>Welcome <?php echo $Auth->authUsername ." (permission level:" . $PermissionList[$Auth->authUserPermission] . ")" ?></p>
           <p>These pages show the administrator Apps.</p>
 
           <ul>
-          <? foreach ($menu as $link => $text)
+          <?php foreach ($menu as $link => $text)
           {
               echo "<li style=\"color : black\">" . ucfirst($text[0]) . " : " . $text[1];
           }

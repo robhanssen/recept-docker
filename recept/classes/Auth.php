@@ -221,7 +221,7 @@ Class Auth
        <h3>You have been logged out</h3>
     </body>
     </html>
-    <?
+    <?php
     exit;
     }
 
@@ -243,7 +243,7 @@ Class Auth
     <link rel="stylesheet" href="<?=$Style?>">
     </head>
     <body>
-    <FORM METHOD="POST" ACTION="<? echo $PHP_SELF ?>">
+    <FORM METHOD="POST" ACTION="<?php echo $PHP_SELF ?>">
           <DIV ALIGN="CENTER"><CENTER>
              <H3>Logon:</H3>
              <TABLE BORDER="1" WIDTH="200" CELLPADDING="2">
@@ -269,7 +269,7 @@ Class Auth
     </FORM>
     </body>
     </html>
-    <?
+    <?php
     exit;
     }
     

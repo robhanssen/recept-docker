@@ -1,5 +1,6 @@
 <?php
-date_default_timezone_set('America/Atlanta');
+$timezone = getenv('TZ') ?: 'Europe/Amsterdam';
+date_default_timezone_set($timezone);
 
 require("./config/config.php");
 require("classes/Webpage.php");
@@ -26,7 +27,13 @@ case false:     $otherfile = "index.secure.php"; $othername = "Secure"; break;
 $page = new Webpage("Het Kookpunt", $Style);
 $db = new DataBase($Host,$Name,$User,$Pass);
 //$visitor = new Visitor();
-if ($secure) $auth = new Auth(EDIT);
+$PHP_SELF = $_SERVER['PHP_SELF'] ?? $_SERVER['SCRIPT_NAME'] ?? 'index.php';
+$secure = isset($secure) ? (bool) $secure : false;
+$otherfile = isset($otherfile) ? $otherfile : 'index.php';
+$othername = isset($othername) ? $othername : 'Open';
+if ($secure) {
+    $auth = new Auth(EDIT);
+}
 
 $maxlistlength = 130;
 $query_tpl = "SELECT gerecht, recepten.receptid as receptid,recepten.gerechtid as gerechtid, 
@@ -64,24 +71,29 @@ $db->DBQuery("select count(receptid) as totaalrecept from recepten");
 $res = $db->DBResult();
 $totaalrecept = $res->totaalrecept;
 
-$display = intval($_GET['display']);
-
-if ($_POST['orderby']) $order = $_POST['orderby'];
-else $order = "naam";
-if (!preg_match('/^(naam|keuken|recepten\.gerechtid)$/', $order)) $order = "naam";
+$display = isset($_GET['display']) ? intval($_GET['display']) : 0;
+$search = isset($_GET['search']) ? $_GET['search'] : (isset($_POST['search']) ? $_POST['search'] : '');
+$order = isset($_POST['orderby']) ? $_POST['orderby'] : (isset($_GET['orderby']) ? $_GET['orderby'] : 'naam');
+if (!preg_match('/^(naam|keuken|recepten\.gerechtid)$/', $order)) {
+    $order = 'naam';
+}
 
 switch ($order)
 {
    case "naam"  : $next = ",keuken"; break;
    case "recepten.gerechtid"  : $next = ",naam"; break;
-   default        : $next = ",naam"; brea;
+   default        : $next = ",naam"; break;
 }
 
-if ($search == "nieuw") $qorder = "recepten.receptid desc limit 15"; 
 $qorder = $order . $next;
+if ($search === 'nieuw') {
+    $qorder = 'recepten.receptid desc limit 15';
+}
 
-$switchvar = "";
-foreach ($_GET as $get_var => $get_val) $switchvar .= "$get_var=$get_val&";
+$switchvar = '';
+foreach ($_GET as $get_var => $get_val) {
+    $switchvar .= "$get_var=$get_val&";
+}
 
 ?>
 
@@ -147,85 +159,90 @@ foreach ($_GET as $get_var => $get_val) $switchvar .= "$get_var=$get_val&";
        <tr>
          <td  class="tablecell" colspan="2">
              Sorteer op
-             <input type="radio" <? if ($order=="naam") echo "checked" ?> name="orderby" value="naam">Naam
-             <input type="radio" <? if ($order=="keuken") echo "checked" ?> name="orderby" value="keuken">Keuken
-             <input type="radio" <? if ($order=="recepten.gerechtid") echo "checked" ?> name="orderby" value="recepten.gerechtid">Type  
+             <input type="radio" <?php if ($order=="naam") echo "checked" ?> name="orderby" value="naam">Naam
+             <input type="radio" <?php if ($order=="keuken") echo "checked" ?> name="orderby" value="keuken">Keuken
+             <input type="radio" <?php if ($order=="recepten.gerechtid") echo "checked" ?> name="orderby" value="recepten.gerechtid">Type  
        </form>       
 </table>
 <?php
 
-if ($_POST['search'])
-   $search = $_POST['search'];
-else if ($_GET['search'])
-   $search = $_GET['search'];
-else $search = "";
+$search = isset($_POST['search']) ? $_POST['search'] : (isset($_GET['search']) ? $_GET['search'] : '');
+$show = isset($_GET['show']) ? intval($_GET['show']) : 0;
 
 switch($search)
 {
     case "nieuw op de site"     : $searchoption = "ref" ; $searchterm = "'%'"; break;
-    case "first"         : $searchoption = "naam"; $searchterm = "'".$_GET['first']."%'"; break; 
+    case "first"         : $searchoption = "naam"; $searchterm = "'" . (isset($_GET['first']) ? $_GET['first'] : '') . "%'"; break; 
     case "zoek naam"     : $searchoption = "naam";
-                                if (!preg_match('/\s/', $_POST['naam']))
-                                   $searchterm = "'%".$_POST['naam']."%'";
+                                $naamValue = isset($_POST['naam']) ? $_POST['naam'] : '';
+                                if (!preg_match('/\s/', $naamValue))
+                                   $searchterm = "'%" . $naamValue . "%'";
                                 else
                                 {
-                                   $naamlijst = explode(" ", $_POST['naam']);
+                                   $naamlijst = explode(" ", $naamValue);
                                    $searchterm = "'%" . implode("%' and naam like '%",$naamlijst) . "%'";
                                 }
 				break;		
     case "naam"		 : $searchoption = "naam";
-                                if (!preg_match('/\s/', $_GET['naam']))
-                                   $searchterm = "'%".$_GET['naam']."%'";
+                                $naamValue = isset($_GET['naam']) ? $_GET['naam'] : '';
+                                if (!preg_match('/\s/', $naamValue))
+                                   $searchterm = "'%" . $naamValue . "%'";
                                 else
                                 {
-                                   $naamlijst = explode(" ", $_GET['naam']);
+                                   $naamlijst = explode(" ", $naamValue);
                                    $searchterm = "'%" . implode("%' and naam like '%",$naamlijst) . "%'";
                                 }
 				break;		
-    case "receptnaam"    : $searchoption = "naam"; $searchterm = "'%". urldecode($_GET['naam']) . "%'"; break;
+    case "receptnaam"    : $searchoption = "naam"; $searchterm = "'%'" . urldecode(isset($_GET['naam']) ? $_GET['naam'] : '') . "%'"; break;
     case "zoek ingredient"    : $searchoption = "ingredient"; 
-                                if (!preg_match('/\s/', $_POST['ingredient']))
-                                   $searchterm = "'%".$_POST['ingredient']."%'";
+                                $ingredientValue = isset($_POST['ingredient']) ? $_POST['ingredient'] : '';
+                                if (!preg_match('/\s/', $ingredientValue))
+                                   $searchterm = "'%" . $ingredientValue . "%'";
                                 else
                                 {
-                                   $ingredlijst = explode(" ", $_POST['ingredient']);
+                                   $ingredlijst = explode(" ", $ingredientValue);
                                    $searchterm = "'%" . implode("%' and ingredient like '%",$ingredlijst) . "%'";
                                 }
 				break;		
     case "ingredient"    : $searchoption = "ingredient";
-                                if (!preg_match('/\s/', urldecode($_GET['ingredient'])))
-                                   $searchterm = "'%".urldecode($_GET['ingredient'])."%'";
+                                $ingredientValue = isset($_GET['ingredient']) ? $_GET['ingredient'] : '';
+                                if (!preg_match('/\s/', urldecode($ingredientValue)))
+                                   $searchterm = "'%'" . urldecode($ingredientValue) . "%'";
                                 else
                                 {
-                                   $ingredlijst = explode(" ", urldecode($_GET['ingredient']));
+                                   $ingredlijst = explode(" ", urldecode($ingredientValue));
                                    $searchterm = "'%" . implode("%' and ingredient like '%",$ingredlijst) . "%'";
                                 }
 				break;    
-    case "zoek keuken"   : $searchoption = "keuken.keukenid"; $searchterm = intval($_POST['keuken']); break;
-    case "keukenid"      : $searchoption = "keuken.keukenid"; $searchterm = intval($_GET['keuken']); break;
-    case "zoek type"     : $searchoption = "recepten.gerechtid"; $searchterm = intval($_POST['gerechttype']); break;
-    case "gerechttype"          : $searchoption = "recepten.gerechtid"; $searchterm = intval($_GET['gerechttype']); break;
+    case "zoek keuken"   : $searchoption = "keuken.keukenid"; $searchterm = intval(isset($_POST['keuken']) ? $_POST['keuken'] : 0); break;
+    case "keukenid"      : $searchoption = "keuken.keukenid"; $searchterm = intval(isset($_GET['keuken']) ? $_GET['keuken'] : 0); break;
+    case "zoek type"     : $searchoption = "recepten.gerechtid"; $searchterm = intval(isset($_POST['gerechttype']) ? $_POST['gerechttype'] : 0); break;
+    case "gerechttype"          : $searchoption = "recepten.gerechtid"; $searchterm = intval(isset($_GET['gerechttype']) ? $_GET['gerechttype'] : 0); break;
     default              : $searchoption = "naam"; $searchterm = "'a%'"; break;
 }
 
 
-if (intval($_GET['show']))
+if ($show)
 {
-    $receptid = intval($_GET['show']);
+    $receptid = $show;
     //$top10 = new Top10($db, $receptid);
     $db->query = preg_replace('/%where%/', "  recepten.receptid = $receptid ", $query_tpl);
     $db->query = preg_replace('/%order%/', " keuken ", $db->query);
     $db->DBQuery();
     $keukentype="";
+    $secure = isset($secure) ? (bool) $secure : false;
+    $ref = '';
     while ($recept = $db->DBResult())
     {
           $keukentype .= ", <a href=\"$PHP_SELF?search=keukenid&keuken=". intval($recept->keukenid)."\">".stripslashes($recept->keuken)."</a>";
           $gerecht = "<a href=\"$PHP_SELF?search=gerechttype&gerechttype=". intval($recept->gerechtid)."\">".stripslashes($recept->gerecht)."</a>";
           $naam = stripslashes($recept->naam);
-          if ($secure) $ref = stripslashes($recept->ref);
-          $opmerking = stripslashes($recept->opmerking); 
-          $ingredient = nl2br(stripslashes($recept->ingredient));
-          $bereiding = nl2br(stripslashes($recept->bereiding));
+          if ($secure) {
+              $ref = stripslashes($recept->ref ?? '');
+          }
+          $opmerking = stripslashes($recept->opmerking ?? ''); 
+          $ingredient = nl2br(stripslashes($recept->ingredient ?? ''));
+          $bereiding = nl2br(stripslashes($recept->bereiding ?? ''));
     }      
 
     $db->query = "SELECT count(viewid) as numberviewers from viewed where receptid = $receptid";
@@ -258,7 +275,7 @@ if (intval($_GET['show']))
        <td class="tablecell"><b>Bereiding</b><br><?=$bereiding ?>     
     <tr colspan="2">
        
-       <td class="tablecell"><a href="<? echo "$PHP_SELF?" . interpretreturnval() ?>">Back</a>
+       <td class="tablecell"><a href="<?php echo "$PHP_SELF?" . interpretreturnval() ?>">Back</a>
     </table>
     <?php
 }
@@ -286,7 +303,7 @@ else
 /* display shorter lists and links to next
     $numtag = $numrecept / $maxlistlength ;
     for ($j = 0; $j <= $numtag; $j++)
-        echo "<a href=\"$PHP_SELF?search=first&first=". $_GET['first'] . "&display=" . ($j*$maxlistlength)."\">[" . ($j*$maxlistlength+1) . "-" . ($j+1)*$maxlistlength . "]</a>";
+        echo "<a href=\"$PHP_SELF?search=first&first=" . (isset($_GET['first']) ? $_GET['first'] : 0) . "&display=" . ($j*$maxlistlength)."\">[" . ($j*$maxlistlength+1) . "-" . ($j+1)*$maxlistlength . "]</a>";
 */
     echo "<br>";
     $oldid = -1;
@@ -297,7 +314,10 @@ else
         $receptid = intval($recept->receptid);
         $back= makereturnval();
         $naam = stripslashes($recept->naam);
-        if ($secure) $ref = stripslashes($recept->ref);
+        $ref = '';
+        if ($secure) {
+            $ref = stripslashes($recept->ref ?? '');
+        }
         $gerecht = stripslashes($recept->gerecht);
         $keuken = stripslashes($recept->keuken);
         $br = "<tr><td class=\"tablecell\">";
@@ -342,11 +362,13 @@ $page->Footer();
 function makeReturnVal()
 {
 //first-receptnaam-ingredient-keukenid-type 
-   $first = $_GET['first'];
+   $first = isset($_GET['first']) ? $_GET['first'] : 0;
    if (!$first)  $first = 0;
-   $receptnaam = ($_POST['naam'])? urlencode($_POST['naam']):urlencode($_GET['naam']);
+   $naamValue = isset($_POST['naam']) ? $_POST['naam'] : (isset($_GET['naam']) ? $_GET['naam'] : '');
+   $receptnaam = $naamValue !== '' ? urlencode($naamValue) : 0;
    if (!$receptnaam) $receptnaam = 0; 
-   $ingredient= ($_POST['ingredient'])? urlencode($_POST['ingredient']):urlencode($_GET['ingredient']);
+   $ingredientValue = isset($_POST['ingredient']) ? $_POST['ingredient'] : (isset($_GET['ingredient']) ? $_GET['ingredient'] : '');
+   $ingredient = $ingredientValue !== '' ? urlencode($ingredientValue) : 0;
    if (!$ingredient) $ingredient = 0;
 /*
    $keukenid = $_POST['keuken'] ? intval($_POST['keuken']):intval($_GET['keuken']);
@@ -360,7 +382,7 @@ function makeReturnVal()
 
 function interpretReturnVal()
 {
-   $back = $_GET['back'];
+   $back = isset($_GET['back']) ? $_GET['back'] : '';
    $return = explode(",", $back);
    foreach ($return as $key => $value)
    {

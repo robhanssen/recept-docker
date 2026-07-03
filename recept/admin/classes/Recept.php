@@ -118,11 +118,11 @@ class Recept
        <p><table>
            <tr>
                  <td>Naam</td>
-                 <td><input name="naam" type="text" value="<? echo $this->naam ?>" size="80"></td>
+                 <td><input name="naam" type="text" value="<?php echo $this->naam ?>" size="80"></td>
             </tr>
             <tr>
                  <td>Referentie</td>
-                 <td><input name="ref" type="text" value="<? echo $this->ref ?>" size="80"></td>
+                 <td><input name="ref" type="text" value="<?php echo $this->ref ?>" size="80"></td>
             </tr>
             <tr>
                  <td>Type</td>
@@ -167,13 +167,13 @@ class Recept
                  <td>Commentaar</td>
                  <td><textarea rows="3" cols="80" name="opmerking"><?=$this->opmerking?></textarea>
             </tr>
-            <input type="hidden" name="receptid" value="<? echo $this->id ?>">
+            <input type="hidden" name="receptid" value="<?php echo $this->id ?>">
     </table>
     <?php if ($this->id) $btname="Aanpassen"; else $btname="Toevoegen"; ?>
     <div align="left"><input type=submit value="<?=$btname?>"></div>
     <div align="right"><input type=reset></div>
     </form>
-    <?
+    <?php
     }
 
     function Display($db,$auth)

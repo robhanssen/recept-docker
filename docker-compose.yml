@@ -1,7 +1,7 @@
 services:
     php-apache-environment:
         container_name: recept
-        image: php:7.4-apache
+        image: php:8.2-apache
         build:
             context: ./recept
             dockerfile: Dockerfile

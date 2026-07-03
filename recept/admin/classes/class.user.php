@@ -163,30 +163,30 @@ class AuthClassedEdit
            global $PermissionList;
            ?>
            <table>
-                  <? if ($func == "new")
+                  <?php if ($func == "new")
                   {
                       ?>
                   <tr>
                       <td>Userid</td>
-                      <td><input name="authuserid" type="text" value="<? echo $this->userid ?>" size="80"></td>
+                      <td><input name="authuserid" type="text" value="<?php echo $this->userid ?>" size="80"></td>
                           <input name="authfunction" type="hidden" value="new">
                   </tr>
-                  <?
+                  <?php
                   }
                   else if ($func == "edit")
                   {
                   ?>
                   <tr>
                       <td>Userid</td>
-                      <td><input name="authuserid" type="hidden" value="<? echo $this->userid ?>"><? echo $this->userid ?></td>
+                      <td><input name="authuserid" type="hidden" value="<?php echo $this->userid ?>"><?php echo $this->userid ?></td>
                           <input name="authfunction" type="hidden" value="edit">
                   </tr>
-                  <?
+                  <?php
                   } 
                   ?>
                   <tr>
                       <td>Username</td>
-                      <td><input name="authusername" type="text" value="<? echo $this->username ?>" size="80"></td>
+                      <td><input name="authusername" type="text" value="<?php echo $this->username ?>" size="80"></td>
                  </tr>
                   <tr>
                       <td>Password</td>
@@ -200,7 +200,7 @@ class AuthClassedEdit
                       ?>                         
                         <td>
                             <select name="authpermission">
-                            <? foreach ($PermissionList as $val => $label)
+                            <?php foreach ($PermissionList as $val => $label)
                              {
                                  echo "<option value=\"$val\" ";
                                  if ($this->permission == $val) echo "selected";
@@ -211,15 +211,15 @@ class AuthClassedEdit
                       <?php
                       } else { 
                       ?>
-                        <td><? echo $PermissionList[$auth->getUserPerm()]; ?><input type="hidden" value="<? echo $auth->getUserPerm(); ?>" name="authpermission"></td>
-                      <? } ?>
+                        <td><?php echo $PermissionList[$auth->getUserPerm()]; ?><input type="hidden" value="<?php echo $auth->getUserPerm(); ?>" name="authpermission"></td>
+                      <?php } ?>
                   </tr>
 
            </table>
            <input type=submit value="Enter data">
            <input type=reset value="Reset to old values">
            </form>
-    <?
+    <?php
     }
 
     function Display($auth)
