@@ -357,10 +357,6 @@ echo "<p>Gevonden: $numrecept van $totaalrecept recept$en</p>";
 
 $page->Footer();
 
-//if (WEBSTAT) webstat();
-//if (GOOGLE) googlead();
-
-
 function makeReturnVal()
 {
 //first-receptnaam-ingredient-keukenid-type 
@@ -404,52 +400,6 @@ function interpretReturnVal()
    return $goback;
 }
 
-
-
-function googlead()
-{
-?>
-<script type="text/javascript"><!--
-google_ad_client = "pub-6292799263121102";
-/* 125x125, gemaakt 3-2-09 */
-google_ad_slot = "9180053762";
-google_ad_width = 125;
-google_ad_height = 125;
-//-->
-</script>
-<script type="text/javascript"
-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-</script>
-<?php
-}
-
-function webstat()
-{
-?>
-<!-- Begin Nedstat Basic code -->
-<!-- Title: Recepten Site -->
-<!-- URL: http://www.catalysis.nl/~rob/recept -->
-<script language="JavaScript" type="text/javascript"
-src="http://m1.nedstatbasic.net/basic.js">
-</script>
-<script language="JavaScript" type="text/javascript">
-<!--
-  nedstatbasic("ADgGYg5IzHAgkd5EnrG19DWCDNrA", 0);
-  // -->
-  </script>
-  <noscript>
-  <a target="_blank"
-  href="http://www.nedstatbasic.net/stats?ADgGYg5IzHAgkd5EnrG19DWCDNrA"><img
-  src="http://m1.nedstatbasic.net/n?id=ADgGYg5IzHAgkd5EnrG19DWCDNrA"
-  border="0" width="18" height="18"
-  alt="Nedstat Basic - Free web site statistics
-  Personal homepage website counter"></a><br>
-  <a target="_blank" href="http://www.nedstatbasic.net/">Free counter</a>
-  </noscript>
-  <!-- End Nedstat Basic code -->
-
-<?php
-}
 
 function GenerateTop($db,$number)
 {

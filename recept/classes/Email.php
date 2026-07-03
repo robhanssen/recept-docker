@@ -3,7 +3,7 @@
 // valid recipients for email
 // format  alias => array( email-address , real-name )
 $ValidRecipients = array(
-                    "web" => array("joyce@peperazzi.nl", "Joyce")
+                    "web" => array("junk@peperazzi.nl", "Junk")
                         );
 
 Class EMail
@@ -91,7 +91,7 @@ Class EMail
                  <p>Subject: $this->subject
                  <br>Message:<p>$this->message
                  <p>Thank you for your interest in our site
-                 <br>Return to the <a href=\"/~rob/recept/index.php\">homepage</a>";
+                 <br>Return to the <a href=\"/index.php\">homepage</a>";
         else echo "There was an error sending your mail";
     }
     

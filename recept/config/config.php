@@ -7,6 +7,5 @@ $Pass = getenv('MYSQL_PASSWORD') ?: 'MYSQL_PASSWORD';
 $Style = '/config/style.css';
 
 $PHP_SELF = $_SERVER['PHP_SELF'];
-define('WEBSTAT', false);
-define('GOOGLE', false);
+
 ?>
