@@ -222,6 +222,8 @@ switch($search)
 }
 
 
+$numrecept = 0;
+
 if ($show)
 {
     $receptid = $show;
